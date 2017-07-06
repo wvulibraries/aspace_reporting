@@ -3,7 +3,7 @@ SELECT
     accession.title,
     accession.identifier,
     accession.accession_date, 
-    accession.condition_description, 
+    accession.content_description, 
     e1.value AS "aquisition_type",
     e2.value AS "resource_type", 
     accession.publish,
