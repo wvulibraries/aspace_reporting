@@ -1,2 +1,5 @@
-
+# ignore excel files 
 *.xlsx
+
+# ignore DS Store 
+.DS_Store
