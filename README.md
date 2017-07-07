@@ -18,6 +18,9 @@ This script runs through variety of data linked accession objects in archivesspa
  - Make sure your in apace_report (this directory if you renamed it) directory 
  - then run `ruby ./main.rb` in a command line or terminal 
 
+## All Archivesspace Data Export 
+  - To get all export data make sure that all the tables for your version of archivesspace are in the csv file seperated by commas.  Then run `ruby ./all_data_excel.rb` in the command line or terminal. **THIS WILL TAKE 10-12 HOURS** 
+
 ### DB Connection 
   ```ruby 
       # create a db connection and query some results 

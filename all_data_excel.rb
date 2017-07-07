@@ -15,17 +15,25 @@ db = DBConnect.new
 @tables = get_aspace_tables
 @workbook = RubyXL::Workbook.new
 
+num_completed = 0 
 # create a spreadsheet for each table
 @tables.each do |table_name|
-  tmp_worksheet = @workbook.add_worksheet(table_name)
+  # SQL Statments 
   sql_statement = "SELECT * FROM `#{table_name}`"
-  sql_results = db.query(sql_statement).to_a 
+  sql_results = db.query(sql_statement).to_a
+
+  # check to make sure theirs results 
+  next if sql_results.length < 1 
+
+  # create a new worksheet 
+  tmp_worksheet = @workbook.add_worksheet(table_name)
 
   # change the style of the worksheet
   tmp_worksheet.change_row_height(0, 80)
   tmp_worksheet.change_row_fill(0, 'eeeeee')
 
   # put the data in columns and rows
+  puts "Writing excel records for #{table_name}"
   sql_results.each_with_index do |row_data, row_number|
     tmp_worksheet.change_row_height(row_number, 30)
     # zebra stripe 
@@ -40,14 +48,14 @@ db = DBConnect.new
 
   # column headers 
   headers = sql_results.first.keys
-  sql_results.each_with_index do |value, col_number| 
+  headers.each_with_index do |value, col_number| 
     tmp_worksheet.insert_cell(0, col_number, value).change_font_color('ffffff')
     tmp_worksheet.change_row_fill(0, '333333')
   end
-  
-  puts "Inserted records for #{table_name}"
-end 
 
-# save it
-@workbook.write("./all_aspace_data.xlsx")
-abort('EVERYTHING SUCCEEDED!')
+  @workbook.write("./all_aspace_data.xlsx")
+  puts "Saved records for #{table_name} "
+  num_completed += 1 
+end
+
+puts "All done!"
