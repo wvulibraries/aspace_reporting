@@ -1,5 +1,5 @@
 # Connects to DB using mysql2 gem
-class DBConnect
+class Database
   # define getters and setters 
   attr_accessor :db_host, :db_user, :db_pass, :db_port, :db_name
   
