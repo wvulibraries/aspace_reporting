@@ -1,7 +1,12 @@
 require 'accessor_report'
+require 'rubyXL'
 
 describe AccessorReport do
   describe 'attributes' do
+    it 'allows reading of the root directory' do
+      expect(subject.root).to eq(ROOT)
+    end 
+
     it 'allows reading and writing of sql data' do
         subject.sql_data = ['data', 'stuff']
         expect(subject.sql_data).to eq(['data', 'stuff'])
@@ -48,14 +53,83 @@ describe AccessorReport do
       expect(check_file).to eq(true)
     end
 
-    it 'creates a workbook if one does not exist and then saves it' do
-      file_path = "#{ROOT}/exports/test.xlsx" 
-      File.delete(file_path) # remove any old ones prior to this test
-      subject.excel_file = "#{ROOT}/exports/test.xlsx"
-      subject.save_workbook
-      check_file = File.exists? "#{ROOT}/exports/test.xlsx"
+    it 'exits because a workbook has not been created' do
+      begin
+        file_path = "#{ROOT}/exports/test.xlsx" 
+          
+        if File.exists? file_path 
+          File.delete(file_path)
+        end 
+
+        subject.excel_file = file_path 
+        expect(subject.save_workbook).to raise_error(SystemExit)
+      rescue SystemExit => exit_status
+        expect(exit_status.status).to eq 1
+      end
     end
   end
+
+  describe '.write_to_workbook' do 
+    it 'exits because a workbook was not created can not write to a non-existant workbook' do
+      begin
+        subject.excel_file = "#{ROOT}/exports/test.xlsx"
+        subject.sql_data = ['test_header': "test"]; 
+        expect(subject.write_to_workbook).to raise_error(SystemExit)
+      rescue SystemExit => exit_status
+        expect(exit_status.status).to eq 1
+      end
+    end
+
+    it 'finds the first worksheet and replaces it' do
+      subject.excel_file = "#{ROOT}/exports/test.xlsx"
+      subject.create_workbook
+      subject.sql_data = ['test_header': "test"]; 
+      subject.write_to_workbook
+      subject.save_workbook
+      workbook = RubyXL::Parser.parse("#{ROOT}/exports/test.xlsx")
+      worksheet = workbook['Sheet1']
+      expect(worksheet).to be_nil
+    end
+
+    it 'can\'t write if there is no data present' do
+      begin
+        subject.excel_file = "#{ROOT}/exports/test.xlsx"
+        subject.create_workbook
+        expect(subject.write_to_workbook).to raise_error(SystemExit)
+      rescue SystemExit => exit_status
+        expect(exit_status.status).to eq 1
+      end
+    end 
+
+     it 'writes to the workbook' do
+      subject.excel_file = "#{ROOT}/exports/test.xlsx"
+      subject.create_workbook
+      subject.sql_data = ['test_header': "test"]
+      subject.write_to_workbook
+      subject.save_workbook
+
+      workbook = RubyXL::Parser.parse("#{ROOT}/exports/test.xlsx")
+      worksheet = workbook['accessions']
+      data = worksheet.sheet_data[0][0].value
+      expect(data.to_s).to eq("test") 
+    end
+  end 
+
+  describe '.write_headers' do
+    it 'writes sql keys to headers' do
+      subject.excel_file = "#{ROOT}/exports/test.xlsx"
+      subject.create_workbook
+      subject.sql_data = ['test_header': "test"]
+      subject.write_to_workbook
+      subject.write_headers
+      subject.save_workbook
+
+      workbook = RubyXL::Parser.parse("#{ROOT}/exports/test.xlsx")
+      worksheet = workbook['accessions']
+      data = worksheet.sheet_data[0][0].value
+      expect(data.to_s).to eq("test_header") 
+    end
+  end 
 
  ## KEY FEATURES OF THE APP
  ## connects to a database

@@ -11,23 +11,38 @@ This script runs through variety of data linked accession objects in archivesspa
 - RubyXL 
 
 ## How to Use
- - First download or clone this repository
- - Make sure you have permissons or a user setup on your archivesspace mysql database.  
- - Change your database connections either in the main.rb file  (see database section)
- - Make sure you have permission to run execute the main.rb file 
- - Make sure your in apace_report (this directory if you renamed it) directory 
- - then run `ruby ./main.rb` in a command line or terminal 
+ refer to the init.rb file 
+ 
+ ```
+ #!/usr/bin/env ruby
 
-### DB Connection 
-  ```ruby 
-      # create a db connection and query some results 
-      db = DBConnect.new()
-      db.db_host  = "127.0.0.1" # your ip here
-      db.db_user  = "root" # your user here 
-      db.db_pass  = "password" # your password here
-      db.db_name = "archivesspace" # this should be the same 
-      db.db_port = "3306" # port number of your mysql db 
-  ```
+# gems 
+require 'mysql2'
+require 'rubyXL'
+
+# require lib folder
+Dir['./lib/*.rb'].each {|file| require file }
+
+# set the root as a constant global
+root = File.dirname(__FILE__) 
+sql_file = FileHelper.new("#{root}/sql/accessions.sql")
+sql = sql_file.get_file_contents.to_s
+
+# connect to db 
+@db = Database.new
+sql_data = @db.query(sql).to_a
+
+# generate report 
+report = AccessorReport.new
+report.excel_file = "#{root}/exports/report.xlsx"
+report.create_workbook
+report.sql_data = sql_data
+report.write_to_workbook
+report.write_headers
+report.save_workbook
+
+puts "Everything worked congrats!"
+``` 
 
 ## Contributing 
 This can be done in the form of documentation, code, or submitting bugs.  
