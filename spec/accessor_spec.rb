@@ -2,10 +2,19 @@ require 'accessor_report'
 
 describe AccessorReport do
   describe 'attributes' do
-    it 'allows reading and writing of sql calls' do
-      subject.sql_call = "SELECT * FROM `test`;"
-      expect(subject.sql_call).to eq("SELECT * FROM `test`;")
+    it 'allows reading and writing of sql data' do
+        subject.sql_data = ['data', 'stuff']
+        expect(subject.sql_data).to eq(['data', 'stuff'])
     end
+
+    it 'expects sql data to be an array' do
+      begin
+        subject.sql_data = "some string"
+        expect(subject.sql_data).to raise_error(SystemExit)
+      rescue SystemExit => exit_status
+        expect(exit_status.status).to eq 1
+      end
+    end 
 
     it 'allows reading and writing of the excel filename' do
       subject.excel_file = 'test.xlsx'
@@ -25,9 +34,27 @@ describe AccessorReport do
   end
 
   describe '.create_workbook' do
-    it 'creates creates a workbook' do
+    it 'creates creates a workbook and sets as instance variable' do
       expect(subject.create_workbook).not_to be_nil
-    end 
+    end
+  end
+
+  describe '.save_workbook' do
+    it 'saves the created workbook' do
+      subject.excel_file = "#{ROOT}/exports/test.xlsx"
+      subject.create_workbook 
+      subject.save_workbook
+      check_file = File.exists? "#{ROOT}/exports/test.xlsx"
+      expect(check_file).to eq(true)
+    end
+
+    it 'creates a workbook if one does not exist and then saves it' do
+      file_path = "#{ROOT}/exports/test.xlsx" 
+      File.delete(file_path) # remove any old ones prior to this test
+      subject.excel_file = "#{ROOT}/exports/test.xlsx"
+      subject.save_workbook
+      check_file = File.exists? "#{ROOT}/exports/test.xlsx"
+    end
   end
 
  ## KEY FEATURES OF THE APP
