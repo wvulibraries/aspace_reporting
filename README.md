@@ -14,7 +14,7 @@ This script runs through variety of data linked accession objects in archivesspa
  refer to the init.rb file 
  
  ```
- #!/usr/bin/env ruby
+#!/usr/bin/env ruby
 
 # gems 
 require 'mysql2'
@@ -24,8 +24,10 @@ require 'rubyXL'
 Dir['./lib/*.rb'].each {|file| require file }
 
 # set the root as a constant global
-root = File.dirname(__FILE__) 
-sql_file = FileHelper.new("#{root}/sql/accessions.sql")
+root = File.dirname(__FILE__)
+
+# grabs the sql file you want to get form the database to put into the excel file
+sql_file = FileHelper.new("#{root}/sql/accessions_report.sql")
 sql = sql_file.get_file_contents.to_s
 
 # connect to db 
@@ -43,6 +45,8 @@ report.save_workbook
 
 puts "Everything worked congrats!"
 ``` 
+
+Using a command line window change directory into the root of this repository.  Then run the command `ruby init.rb`.  Make sure you have your database set up, to avoid working on a production database I made a database dump of the production database and uploaded it to a docker container on my local machine.  I would recommend some solution like this so your not having to worry about the production data. 
 
 ## Contributing 
 This can be done in the form of documentation, code, or submitting bugs.  

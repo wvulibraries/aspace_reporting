@@ -8,7 +8,9 @@ require 'rubyXL'
 Dir['./lib/*.rb'].each {|file| require file }
 
 # set the root as a constant global
-root = File.dirname(__FILE__) 
+root = File.dirname(__FILE__)
+
+# grabs the sql file you want to get form the database to put into the excel file
 sql_file = FileHelper.new("#{root}/sql/accessions_report.sql")
 sql = sql_file.get_file_contents.to_s
 
