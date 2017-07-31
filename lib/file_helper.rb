@@ -5,7 +5,7 @@ class FileHelper
   # *Params*: 
   # - +dir+ -> the directory the files are in (MUST BE A DIRECTORY OBJECT)
   def initialize (file_path)
-    @file_path = file_path 
+    @file_path = file_path
   end
 
   # gets the file contents of given file
@@ -16,5 +16,5 @@ class FileHelper
   def get_file_contents
     o_file = File.open(file_path, "rb")
     contents = o_file.read
-  end 
-end  
+  end
+end

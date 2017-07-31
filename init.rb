@@ -9,7 +9,7 @@ Dir['./lib/*.rb'].each {|file| require file }
 
 # set the root as a constant global
 root = File.dirname(__FILE__) 
-sql_file = FileHelper.new("#{root}/sql/accessions.sql")
+sql_file = FileHelper.new("#{root}/sql/accessions_report.sql")
 sql = sql_file.get_file_contents.to_s
 
 # connect to db 
